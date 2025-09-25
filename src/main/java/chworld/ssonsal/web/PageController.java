@@ -1,0 +1,99 @@
+package chworld.ssonsal.web;
+
+import chworld.ssonsal.member.auth.CustomUserDetails;
+import chworld.ssonsal.session.domain.SessionStatus;
+import chworld.ssonsal.todo.domain.Todo;
+import chworld.ssonsal.todo.domain.TodoStatus;
+import chworld.ssonsal.todo.dto.TodoResponse;
+import chworld.ssonsal.todo.repository.TodoRepository;
+import chworld.ssonsal.todo.service.TodoService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequiredArgsConstructor
+public class PageController {
+
+    private final TodoRepository todoRepository;
+
+    @Autowired
+    private TodoService todoService;
+
+    @GetMapping("/register")
+    public String register(){ return "register"; }
+
+    @GetMapping("/login")
+    public String login(){ return "login"; }
+
+
+    /** 갔다와서 해야할것
+     * 1. todo_tbl을 조회한다
+     * 2. 현재 로그인한 member_id의 값만찾고 uniq_data의 ASC순서로 가져온다.
+     * 3. uniq_data를 저장해놓고 session_tbl의 id와 조회한후 같은값이있을때 체감시간을 가져온다.
+     * 4. 체감시간이 null이거나 없으면 0을 유지시켜준다.
+     * */
+
+    @GetMapping("/log")
+    public String log(@AuthenticationPrincipal CustomUserDetails userDetails, Model model){
+        Long memberId = userDetails.getId();
+        Map<LocalDate, Map<String, List<Todo>>> groupedTodos = todoService.getGroupedTodos(memberId);
+
+        List<Todo> allTodos = groupedTodos.values().stream()
+                .flatMap(map -> map.values().stream())
+                .flatMap(List::stream)
+                .toList();
+
+        Map<String, TodoService.SessionTimeInfo> sessionTimeMap = todoService.getSessionTimeInfoMap(allTodos);
+
+        model.addAttribute("groupedTodos", groupedTodos);
+        model.addAttribute("sessionTimeMap", sessionTimeMap);
+
+        return "log";
+    }
+
+    @GetMapping("/")
+    public String main(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if(userDetails == null){
+            return "redirect:/login";
+        }
+
+        Long memberId = userDetails.getId();
+        Map<String, List<TodoResponse>> todos = todoService.getTodosByMemberGroupedByStatus(memberId);
+        model.addAttribute("todos", todos);
+        return "index";
+    }
+
+    @GetMapping("/condition")
+    public String condition() {
+        return "condition";
+    }
+
+    @GetMapping("/trip")
+    public String trip(@AuthenticationPrincipal CustomUserDetails userDetails,
+                       @RequestParam(name="condition", required=false) SessionStatus condition,
+                       Model model) {
+        Long memberId = userDetails.getId();
+
+        List<TodoResponse> sortedTodos = todoService.getTodosByMemberSortedByCondition(memberId,condition);
+
+        model.addAttribute("todos", sortedTodos);
+        model.addAttribute("condition",condition);
+
+        return "trip";
+    }
+
+    @GetMapping("/trip-end")
+    public String tripEnd() {
+        return "trip-end";
+    }
+
+}

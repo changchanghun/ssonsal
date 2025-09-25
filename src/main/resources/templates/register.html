@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>회원가입</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .register-container {
+            max-width: 500px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        #emailCheckResult {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="register-container">
+        <h2 class="text-center mb-4">회원가입</h2>
+        <form id="registForm" action="/save" method="post">
+            <div class="mb-3">
+                <label for="email" class="form-label">이메일</label>
+                <input type="email" class="form-control" id="email" name="memberEmail"  placeholder='@가 들어간 이메일 형식을 입력해주세요' required>
+            </div>
+            <div>
+                <div>
+                    <button type="button" id="checkEmailBtn">중복확인 버튼</button>
+                    <span id="emailCheckResult"></span>
+                </div>
+                <div id="send_box" style="display:none;">
+                    <button type="button" id="email_send">이메일 인증하기</button>
+                    <div id="verification_box" style="display:none;">
+                        <input type="text" id="email_verification">
+                        <button type="button" id="verification_btn">인증번호 확인</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">이름</label>
+                <input type="text" class="form-control" id="name" name="memberName" oninput="this.value = this.value.replace(/[0-9`~!@#$%^&*()_\-+=\[\]{}|\\;:'\,.<>/?]/g, '')" placeholder='이름은 한글 또는 영어만 입력 가능합니다' required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <input type="password" class="form-control" id="password" name="memberPassword" required>
+            </div>
+            <div class="mb-3">
+                <label for="password_confirm" class="form-label">비밀번호 확인</label>
+                <input type="password" class="form-control" id="password_confirm" name="memberPasswordConfirm" required>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">가입하기</button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <a href="index.php">로그인 페이지로 돌아가기</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        let id_check_flag = false;                  // 중복확인 플래그
+        let mail_check_flag = false;                // 이메일 인증 플래그
+
+        // 이메일 중복 확인시
+        $("#checkEmailBtn").on("click", function(){
+            const email = $.trim($("#email").val());
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if(!email){
+                alert("이메일을 입력해주세요");
+                return;
+            } else if(!emailRegex.test(email)){
+                alert("올바른 이메일 형식을 입력해주세요");
+                return false;
+            }
+
+            $.ajax({
+                url: "/check-email",
+                type: "GET",
+                data: {email:email},
+                success: function(isDuplicate){
+                    const $result = $("#emailCheckResult");
+                    if(isDuplicate){
+                        $result.text("이미 사용 중인 이메일입니다.").css("color","red");
+                        id_check_flag = false;
+                        $("#email").val("");
+                    }else{
+                        $result.text("사용 가능한 이메일입니다.").css("color","green");
+                        id_check_flag = true;
+                        $("#email").prop("readonly", true);
+                        $("#send_box").css('display','block');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("오류: " + xhr.responseText);
+                    return false;
+                }
+            })
+        });
+
+        // 이메일 인증 보내기 클릭시
+        $("#email_send").on("click", function (){
+            const email = $.trim($("#email").val());
+
+            $.ajax({
+                url: "/api/email/send",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    email : email
+                }),
+                success: function (response) {
+                    alert("전송 완료.");
+                    $("#verification_box").css("display","block");
+                },
+                error: function (xhr, status, error) {
+                    alert("오류: " + xhr.responseText);
+                    return false;
+                }
+            });
+        })
+
+        // 이메일 인증 확인 클릭시
+        $("#verification_btn").on("click", function(){
+            const email = $.trim($("#email").val());
+            const code = $.trim($("#email_verification").val());
+            $.ajax({
+                url: "/api/email/verify",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    email : email,
+                    code : code
+                }),
+                success: function (response) {
+                    alert("인증 완료.");
+                    mail_check_flag = true;
+                    $("#email_verification").prop("readonly", true);
+                },
+                error: function (xhr, status, error) {
+                    alert("오류: " + xhr.responseText);
+                    return false;
+                }
+            });
+        });
+
+        // 회원가입 폼 제출시
+        $("#registForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const name = $.trim($("#name").val());
+            const email = $.trim($("#email").val());
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const pw = $.trim($("#password").val());
+            const con_pw = $.trim($("#password_confirm").val());
+
+            if (!email) {
+                alert("이메일을 입력해주세요.");
+                return false;
+            }else if(!emailRegex.test(email)){
+                alert("올바른 이메일 형식을 입력해주세요");
+                return false;
+            }else if (!name) {
+                alert("이름을 입력해주세요.");
+                return false;
+            }else if (!pw) {
+                alert("비밀번호를 입력해주세요.");
+                return false;
+            }else if (pw !== con_pw) {
+                alert("비밀번호가 일치하지 않습니다.");
+                return false;
+            }else if (id_check_flag == false){
+                alert("이메일 중복확인을 진행해주세요.");
+                return false;
+            }else if (mail_check_flag == false){
+                alert("이메일 인증을 진행해주세요.");
+                return false;
+            }
+
+            $.ajax({
+                url: "/save",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    memberName: name,
+                    memberEmail: email,
+                    memberPassword: pw
+                }),
+                success: function (response) {
+                    alert("회원 가입이 완료 되었습니다.")
+                    window.location.href = "/";
+                },
+                error: function (xhr, status, error) {
+                    alert("오류: " + xhr.responseText);
+                    return false;
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>이동 중</title>
+	<link rel="stylesheet" href="/css/app.css" />
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="dark">
+	<div class="topbar">
+		<h1>이동 중</h1>
+		<div class="end" style="cursor:pointer; right:16px; top: 50%; left:auto; color:#e5e7eb; position:absolute; transform: translateY(-50%);" >종료</div>
+	</div>
+	<div class="time-box">
+		<span id="timer">00:00</span>
+	</div>
+	<div class="container">
+		<div class="pill">
+			<span class="status">현재 상태</span>
+			  컨디션 
+			<span class="status-data"> 보통 </span>
+		</div>
+
+		<div class="success-box" style="display:none;">
+			<h3 style="margin:16px 0 8px">완료한 작업</h3>
+			<div class="card success">
+				<p class="empty-message">-</p>
+			</div>
+		</div>
+
+		<div class="card" style="margin-top:16px;">
+			<div th:each="todo : ${todos}"
+				 th:if="${todo.status.name() == 'PENDING'}"
+				 th:class="'todo-item ' + ${todo.level.toString().toLowerCase()}"
+				 th:attr="data-id=${todo.id}">
+				<div class="todo-left">
+					<span class="level" th:switch="${todo.level.name()}">
+						<span th:case="LOW">●</span>
+						<span th:case="NORMAL">●●</span>
+						<span th:case="HARD">●●●</span>
+					</span>
+					<span class="text" th:text="${todo.title}"></span>
+				</div>
+				<span class="success-btn">🔄</span>
+			</div>
+		</div>
+	</div>
+</body>
+</html> 
+<script>
+	// 카운트
+	let seconds = 0;
+	let formatted = ``;
+	function updateTimer() {
+	  seconds++;
+
+	  let minutes = Math.floor(seconds / 60);
+	  let remainingSeconds = seconds % 60;
+	  formatted = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+
+	  $('#timer').text(formatted);
+	}
+
+	setInterval(updateTimer, 1000);
+
+	let condition = localStorage.getItem("condition");
+	let sessionId = localStorage.getItem("sessionId");
+	let ch_condition = "";
+	switch(condition){
+		case "BAD" :
+			ch_condition = "최악";
+			break;
+		case "NORMAL" :
+			ch_condition = "보통";
+			break;
+		case "GOOD" :
+			ch_condition = "최고";
+			break;
+	};
+
+	localStorage.removeItem("condition");
+	$(".status-data").text(ch_condition);
+
+	// 완료
+	$(".success-btn").on("click", function(){
+		let button = $(this);
+		let id = $(this).parent().data("id");
+		let text = $(this).parent().find('.text').text();
+		let level = $(this).parent().find('.level span').text();
+
+		let [minStr, secStr] = formatted.split(":");
+		let minutes = parseInt(minStr, 10);
+		let seconds = parseInt(secStr, 10);
+		let count;
+
+		// 스토리지 사용
+		let completed = JSON.parse(localStorage.getItem("completedTasks") || "[]");
+		completed.push({ id, text, level });
+
+		localStorage.setItem("completedTasks", JSON.stringify(completed));
+
+		if(minutes > 0){
+			count = minutes+"분";
+		}else{
+			count = seconds+"초";
+		}
+
+		$.ajax({
+			url: `/api/todos/${id}/complete?sessionId=${sessionId}`,
+			type: "POST",
+			success: function (response) {
+				button.parent().css("display","none");
+				$(".success-box").css("display","block");
+				$(".empty-message").css("display","none");
+				$(".card.success").append('<div class="todo-item" style="cursor:unset;"><div class="todo-left">'+level+'<span class="line">'+text+'</span></div><span class="time-chip">-'+count+'</span></div>');
+			},
+			error: function (xhr, status, error) {
+				alert("오류: " + xhr.responseText);
+				return false;
+			}
+		});
+	})
+
+	$(".end").on("click", function(){
+		localStorage.setItem("finalTimer", formatted);
+		location.href="/trip-end";
+	});
+</script>

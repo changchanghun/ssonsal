@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>홈 · 로그</title>
+    <link rel="stylesheet" href="/css/app.css" />
+    <!-- 데이트 피커 -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- 데이트 피커 -->
+</head>
+<body>
+    <div class="container">
+        <div class="header" style="margin-bottom:100px;">
+            <a class="home-btn" href="/">홈</a>
+            <a class="log-btn log" href="/log">로그</a>
+        </div>
+
+        <p class="subtitle">이동시간으로 미룬</p>
+        <h1 class="title-lg">일상의 자잘한 일들,</h1>
+        <div class="input-row text">
+            <input type="text" class="input" placeholder="할 일을 입력해 주세요." />
+            <button id="save-btn">&#128172;</button>
+        </div>
+        <div class="input-row">
+            <span class="pill good">● <span class="hidden">LOW</span></span>
+            <span class="pill mid">●● <span class="hidden">NORMAL</span></span>
+            <span class="pill bad">●●● <span class="hidden">HARD</span></span>
+        </div>
+        <input type="text" id="datepicker" placeholder="날짜를 선택해주세요." readonly>
+
+        <h3 class="section-title" th:if="${not #lists.isEmpty(todos['PENDING'])}">작성한 리스트</h3>
+        <div class="card hard"
+             th:if="${#lists.contains(todos['PENDING'].![level.name()], 'HARD')}">
+            <div class="todo-left"><span class="badge hard">●●● Hard</span></div>
+            <div th:each="todo : ${todos['PENDING']}" th:if="${todo.level.name() == 'HARD'}" class="todo-item">
+                <div class="todo-left">
+                    <span th:text="${todo.title}">할 일 제목</span>
+                </div>
+                <span class="del-btn" th:data-id="${todo.id}">&#128163;</span>
+                <span class="time-chip" th:text="${todo.dDay}">D-0</span>
+            </div>
+        </div>
+        <div class="card mid"
+             th:if="${#lists.contains(todos['PENDING'].![level.name()], 'NORMAL')}">
+            <div class="todo-left"><span class="badge mid">●● Mid</span></div>
+            <div th:each="todo : ${todos['PENDING']}" th:if="${todo.level.name() == 'NORMAL'}" class="todo-item">
+                <div class="todo-left">
+                    <span th:text="${todo.title}">할 일 제목</span>
+                </div>
+                <span class="del-btn" th:data-id="${todo.id}">&#128163;</span>
+                <span class="time-chip" th:text="${todo.dDay}">D-0</span>
+            </div>
+        </div>
+        <div class="card low"
+             th:if="${#lists.contains(todos['PENDING'].![level.name()], 'LOW')}">
+            <div class="todo-left"><span class="badge low">● Low</span></div>
+            <div th:each="todo : ${todos['PENDING']}" th:if="${todo.level.name() == 'LOW'}" class="todo-item">
+                <div class="todo-left">
+                    <span th:text="${todo.title}">할 일 제목</span>
+                </div>
+                <span class="del-btn" th:data-id="${todo.id}">&#128163;</span>
+                <span class="time-chip" th:text="${todo.dDay}">D-0</span>
+            </div>
+        </div>
+    </div>
+    <button class="fab" onclick="location.href='/condition'">▶</button>
+    <div style="text-align:center;">
+        <form th:action="@{/logout}" method="post">
+            <button class="logout-btn" type="submit">로그아웃</button>
+        </form>
+    </div>
+
+</body>
+</html>
+<script>
+    // 날짜
+    $("#datepicker").datepicker({
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,
+        changeYear: true,
+        minDate: 0
+    });
+
+    // 투두 아이템 클릭
+    $(".todo-item").on("click", function(){
+        $(".todo-item").removeClass("active");
+        $(".time-chip").css("display","block");
+        $(".todo-item .del-btn").css("display","none");
+        
+        $(this).addClass("active");
+        $(this).children(".time-chip").css("display","none");
+        $(this).children(".del-btn").css("display","block");
+    })
+
+    // 투두 생성 기분 클릭
+    $(".input-row .pill").on("click", function(){
+        $(".pill").removeClass("active");
+        $(".pill .hidden").css("display","none");
+
+
+        $(this).addClass("active");
+        $(this).children(".hidden").css("display","block");
+        $("#datepicker").css("display","block");
+    })
+
+
+
+
+    // 투두 삭제
+    $(".del-btn").on("click", function(){
+        // 아이템의 id 값 저장
+        let del_item = $(this).data("id");
+
+        $.ajax({
+            url: "/api/todos/"+del_item,
+            type: "DELETE",
+            success: function (response) {
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                alert("오류: " + xhr.responseText);
+                return false;
+            }
+        });
+    })
+
+    // 투두 생성
+    $("#save-btn").on("click", function(){
+        let text_val = $(".input").val();
+        let pill = $(".pill.active").children(".hidden").text();
+        let plan_dtm = $("#datepicker").val();
+
+        if (!text_val || text_val.trim() === "") {
+            alert("텍스트를 적으세요.");
+            return false;
+        } else if (!pill || pill.trim() === "") {
+            alert("레벨을 선택해주세요.");
+            return false;
+        } else if (!plan_dtm || plan_dtm.trim() === "") {
+            alert("날짜를 선택해주세요.");
+            return false;
+        }
+
+        $.ajax({
+            url: "/api/todos",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                title: text_val,
+                level: pill,
+                planDtm: plan_dtm
+            }),
+            success: function (response) {
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                alert("오류: " + xhr.responseText);
+                return false;
+            }
+        });
+    });
+
+
+</script>

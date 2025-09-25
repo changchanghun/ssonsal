@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>조건 설정</title>
+    <link rel="stylesheet" href="/css/app.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="topbar">
+    <a class="back" href="/">←</a>
+    <h1>조건 설정</h1>
+</div>
+<div class="container center">
+    <h2 class="title-lg">오늘 컨디션은?</h2>
+    <p class="muted">현재 이동상황을 선택해주세요</p>
+    <div class="selector">
+        <button data-level="BAD">😵‍💫 최악</button>
+        <button data-level="NORMAL">🙂 보통</button>
+        <button data-level="GOOD">😌 최상</button>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    // 컨디션 선택
+    $(".selector button").on("click", function(){
+        $(".selector button").removeClass("active");
+        $(this).addClass("active");
+        let condition = $(this).data("level");
+
+        $.ajax({
+            url: "/api/session",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                status: condition
+            }),
+            success: function (response) {
+                let sessionId = response.id;
+                localStorage.setItem("sessionId", sessionId);
+                localStorage.setItem("condition", condition);
+                location.href = `/trip?condition=${condition}`;
+            },
+            error: function (xhr, status, error) {
+                alert("오류: " + xhr.responseText);
+                return false;
+            }
+        });
+    })
+
+</script>

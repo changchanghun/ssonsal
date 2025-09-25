@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>이동 종료</title>
+	<link rel="stylesheet" href="/css/app.css" />
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+	<div class="topbar">
+		<h1>이동 종료</h1>
+	</div>
+	<div class="container center">
+		<p class="muted">이동시간이 얼마나 짧게 느껴졌나요?</p>
+		<div class="end-time">32:25</div>
+		<p class="muted time"></p>
+
+		<div class="card" style="margin-top:16px; opacity:.7">
+			<h4 class="muted" style="margin:0 0 8px;">완료한 작업</h4>
+		</div>
+
+		<div class="adjust-grid">
+			<button class="adjust-btn minus" data-minute="-5">-5분</button>
+			<button class="adjust-btn plus" data-minute="5">+5분</button>
+			<button class="adjust-btn minus" data-minute="-10">-10분</button>
+			<button class="adjust-btn plus" data-minute="10">+10분</button>
+			<button class="adjust-btn minus" data-minute="-30">-30분</button>
+			<button class="adjust-btn plus" data-minute="30">+30분</button>
+		</div>
+
+		<button class="end-submit">종료</button>
+	</div>
+</body>
+</html> 
+<script>
+	let completed = JSON.parse(localStorage.getItem("completedTasks") || "[]");
+  	let finalTimer = localStorage.getItem("finalTimer");
+	let sessionId = localStorage.getItem("sessionId");
+
+	let time_flag = false;
+
+	$(".end-time").text(finalTimer);
+
+	if(completed.length === 0){
+		$(".card").append(`
+        	<div class="todo-item" style="cursor:unset; opacity:0.5;">
+            	<div class="todo-left">
+                	<span class="level">-</span>
+                	<span class="text">완료된 투두가 없습니다</span>
+            	</div>
+        	</div>
+    	`);
+	} else {
+		completed.forEach(task=>{
+			$(".card").append(`
+				<div class="todo-item" style="cursor:unset;">
+					<div class="todo-left">${task.level} <span>${task.text}</span></div>
+				</div>
+			`)
+		});
+	}
+
+	// 체감시간 선택
+	$(".adjust-btn").on('click', function(){
+		$(".adjust-btn").removeClass("active");
+		$(this).addClass("active");
+		minute = $(this).data("minute");
+
+		let has = $(this).hasClass("plus");
+		if(has){
+			$('.muted.time').text(minute+"분 더 길게 느껴졌어요!");
+		}else{
+			$('.muted.time').text(minute+"분 더 짧게 느껴졌어요!");
+		}
+
+		time_flag = true;
+
+	});
+
+	localStorage.removeItem("sessionId");
+	localStorage.removeItem("completedTasks");
+  	localStorage.removeItem("finalTimer");
+
+	// 세션 종료(업데이트)
+	$(".end-submit").on("click", function(){
+
+		if(time_flag == false){
+			alert("체감 시간을 선택해주세요!");
+			return false;
+		}
+
+		$.ajax({
+			url: "/api/session/"+sessionId+"/end",
+			type: "PATCH",
+			contentType: "application/json",
+			data: JSON.stringify({
+				finalTime: finalTimer,
+				time: minute
+			}),
+			success: function (response) {
+				alert("이동이 종료되었습니다.");
+				location.href = "/";
+			},
+			error: function (xhr, status, error) {
+				alert("오류: " + xhr.responseText);
+				return false;
+			}
+		});
+	});
+</script>

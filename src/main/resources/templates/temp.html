@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>작업 로그</title>
+    <link rel="stylesheet" href="/css/app.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header" style="margin-bottom:100px;">
+        <a class="home-btn" href="/">홈</a>
+        <a class="log-btn log" href="/log">로그</a>
+    </div>
+
+    <h1 class="title-lg">완료된 작업 로그</h1>
+    <p class="subtitle">이동 중에 마친 일들을 모아봤어요.</p>
+
+    <div th:each="entry : ${groupedTodos}">
+        <h3 th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}">날짜</h3>
+
+        <div th:each="uniqEntry : ${entry.value}">
+            <div class="card success">
+                <p th:text="'그룹: ' + ${uniqEntry.key}">그룹 이름</p>
+
+                <div th:each="todo : ${uniqEntry.value}" class="todo-item" th:classappend="${todo.level.name().toLowerCase()}">
+                    <div class="todo-left">
+                    <span class="level" th:switch="${todo.level.name()}">
+                        <span th:case="LOW">●</span>
+                        <span th:case="NORMAL">●●</span>
+                        <span th:case="HARD">●●●</span>
+                    </span>
+                        <span class="text" th:text="${todo.title}">작업 제목</span>
+                    </div>
+                    <span class="time-chip" th:text="${#temporals.format(todo.finalDtm, 'mm:ss')}">완료 시간</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card empty" th:if="${#maps.isEmpty(groupedTodos)}">
+        <p class="empty-message">완료된 작업이 없습니다.</p>
+    </div>
+</div>
+</body>
+</html>
