@@ -4,14 +4,17 @@
 
 ## 📸 스크린샷
 
-| 로그인 화면 | 메인화면 |
+| 메인화면 | 컨디션 설정(이동시작시) |
 |-------------|-------------|
-| <img width="300" src="https://github.com/user-attachments/assets/6f4115ed-d673-4bb8-b072-135bafebdd46" /> | <img width="300" src="https://github.com/user-attachments/assets/a8bfeb6f-5f84-4443-ba4d-14b90fdc772c" /> |
+| <img width="300" alt="Image" src="https://github.com/user-attachments/assets/2563c134-b09d-4c06-b6d1-6e6fe3f110e8" /> | <img width="300" alt="Image" src="https://github.com/user-attachments/assets/2935cd6b-c3f5-4449-953a-2ff92b9ac638" /> |
 
-| 반응형 | 즐겨찾기 |
+| 이동시작 | 이동종료 |
 |-------------|-------------|
-| <img width="300" src="https://github.com/user-attachments/assets/85a74642-5879-40e8-a1f4-4fa63d04a369" /> | <img width="300" src="https://github.com/user-attachments/assets/40ab1f7a-673e-495a-ae72-5f3c5768d86e" /> |
+| <img width="300" alt="Image" src="https://github.com/user-attachments/assets/f6b3c0b0-773c-460f-b4df-5b31118543a0" /> | <img width="300" alt="Image" src="https://github.com/user-attachments/assets/7704aef5-fabf-4cc4-9e36-f96e324d77dd" /> |
 
+| 로그 |
+|-------------|
+| <img width="300" alt="Image" src="https://github.com/user-attachments/assets/20534132-eca8-4db1-99d7-3762ee49a7a5" /> |
 ## 🧰 기술 스택
 
 - 데이터베이스 : postgreSQL (koyeb)
