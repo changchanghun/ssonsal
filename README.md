@@ -2,6 +2,8 @@
 - 회원들의 효율적인 일정관리를 돕습니다.
 - 디자이너 협업 프로젝트
 
+🌐 배포 주소 👉 http://chworld2.dothome.co.kr/agency](https://marine-therine-ch7856lee-6127befe.koyeb.app/
+
 ## 📸 스크린샷
 
 | 메인화면 | 컨디션 설정(이동시작시) |
