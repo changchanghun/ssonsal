@@ -155,8 +155,8 @@ button { cursor: pointer; }
   padding:6px 10px;
 }
 .todo-left { display: flex; align-items: center; gap: 10px; color: #475569; }
-.todo-left span{
-  margin:8px;
+.todo-left .level{
+    width:50px;
 }
 .badge { font-size: 12px; font-weight: 800; padding: 6px 10px; border-radius: 999px; }
 .badge.hard { background:#ef4444; color:#fff; }
