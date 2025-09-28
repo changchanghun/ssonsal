@@ -7,5 +7,5 @@ function hideLoading() {
 }
 
 $(document).ready(function () {
-  setTimeout(hideLoading, 3000);
+  hideLoading();
 });
