@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -14,6 +15,7 @@ public class MailService {
     private final JavaMailSender javaMailSender;
     private static final String senderEmail = "ch4856lee@gmail.com";
 
+    @Async
     public void sendVerificationMail(String email, String code){
         MimeMessage message = javaMailSender.createMimeMessage();
 

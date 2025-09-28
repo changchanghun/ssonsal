@@ -34,14 +34,6 @@ public class PageController {
     @GetMapping("/login")
     public String login(){ return "login"; }
 
-
-    /** 갔다와서 해야할것
-     * 1. todo_tbl을 조회한다
-     * 2. 현재 로그인한 member_id의 값만찾고 uniq_data의 ASC순서로 가져온다.
-     * 3. uniq_data를 저장해놓고 session_tbl의 id와 조회한후 같은값이있을때 체감시간을 가져온다.
-     * 4. 체감시간이 null이거나 없으면 0을 유지시켜준다.
-     * */
-
     @GetMapping("/log")
     public String log(@AuthenticationPrincipal CustomUserDetails userDetails, Model model){
         Long memberId = userDetails.getId();
