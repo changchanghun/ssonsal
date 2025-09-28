@@ -30,7 +30,7 @@ public class SessionController {
     @PatchMapping("/{sessionId}/end")
     public ResponseEntity<SessionResponse> endSession(@PathVariable Long sessionId,
                                                       @RequestBody @Valid SessionRequest request) {
-        Session ended = sessionService.endSession(sessionId, request.getFinalTime() ,request.getTime());
+        Session ended = sessionService.endSession(sessionId,request.getTime());
         return ResponseEntity.ok(new SessionResponse(ended));
     }
 

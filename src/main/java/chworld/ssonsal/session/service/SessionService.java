@@ -5,12 +5,12 @@ import chworld.ssonsal.session.domain.Session;
 import chworld.ssonsal.session.dto.SessionRequest;
 import chworld.ssonsal.member.repository.MemberRepository;
 import chworld.ssonsal.session.repository.SessionRepository;
-import chworld.ssonsal.todo.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -19,7 +19,6 @@ public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final MemberRepository memberRepository;
-    private final TodoRepository todoRepository;
 
     // 세션 생성
     public Session createSession(SessionRequest request){
@@ -39,20 +38,12 @@ public class SessionService {
     }
 
     // 마지막 저장
-    public Session endSession(Long sessionId, String finalTimeStr, int time){
+    public Session endSession(Long sessionId, int time){
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(()->new IllegalArgumentException("세션을 찾을 수 없습니다."));
 
-        Instant baseTime = session.getStartTime();
-        String[] parts = finalTimeStr.split(":");
-        int minutes = Integer.parseInt(parts[0]);
-        int seconds = Integer.parseInt(parts[1]);
-        Duration duration = Duration.ofMinutes(minutes).plusSeconds(seconds);
-
-        // 종료 시간 계산
-        Instant calcuEndtime = baseTime.plus(duration);
-
-        session.setEndTime(calcuEndtime);
+        Instant instantKST = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toInstant();
+        session.setEndTime(instantKST);
         session.setTime(time);
 
         return sessionRepository.save(session);

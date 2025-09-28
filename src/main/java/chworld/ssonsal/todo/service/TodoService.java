@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,7 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("할 일을 찾을 수 없습니다."));
 
         todo.setStatus(TodoStatus.DONE);
-        todo.setFinalDtm(LocalDate.now());
+        todo.setFinalDtm(LocalDate.now(ZoneId.of("Asia/Seoul")));
         todo.setUniqData(sessionId);
 
         return todoRepository.save(todo);
@@ -111,17 +112,29 @@ public class TodoService {
     public Map<LocalDate, Map<String, List<Todo>>> getGroupedTodos(Long memberId) {
         List<Todo> todos = todoRepository.findByMemberIdAndStatus(memberId, TodoStatus.DONE);
 
-        return todos.stream()
+        Map<LocalDate, Map<String, List<Todo>>> grouped = todos.stream()
                 .filter(todo -> todo.getFinalDtm() != null && todo.getUniqData() != null)
                 .collect(Collectors.groupingBy(
                         Todo::getFinalDtm,
-                        LinkedHashMap::new,
+                        () -> new TreeMap<>(Comparator.reverseOrder()), // 날짜 내림차순
                         Collectors.groupingBy(
                                 Todo::getUniqData,
                                 LinkedHashMap::new,
                                 Collectors.toList()
                         )
                 ));
+
+        // 각 날짜 그룹 안의 리스트를 시간순으로 정렬
+        for (Map<String, List<Todo>> innerMap : grouped.values()) {
+            for (Map.Entry<String, List<Todo>> entry : innerMap.entrySet()) {
+                List<Todo> sortedList = entry.getValue().stream()
+                        .sorted(Comparator.comparing(Todo::getFinalDtm).reversed())
+                        .collect(Collectors.toList());
+                entry.setValue(sortedList);
+            }
+        }
+
+        return grouped;
     }
 
     public Map<String, SessionTimeInfo> getSessionTimeInfoMap(List<Todo> todos) {
