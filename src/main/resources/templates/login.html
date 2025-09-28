@@ -21,6 +21,15 @@
             text-align: center;
             margin-bottom: 24px;
         }
+        .btn{
+        	width:100%;
+        	background:#ccc;
+        	margin: 15px 0;
+        }
+        .btn.active{
+		    background: #007bff !important;
+    		color: #fff;
+        }
         .mid_box {
             text-align: center;
             margin-top: 16px;
@@ -55,7 +64,7 @@
 		<div class="mid_box">
 			<a href="register">회원가입</a> |
 			<a href="user_find.php?type=1">아이디 찾기</a> |
-			<a href="user_find.php?type=2">비밀번호 찾기</a>
+			<a href="find_pw">비밀번호 찾기</a>
 		</div>
 	</div>
 </div>
@@ -68,4 +77,19 @@
 		alert("로그아웃 되었습니다.");
 		history.replaceState({}, document.title, "/login"); // URL 정리
   	}
+
+	function checkInputs() {
+		const id = document.getElementById('id').value.trim();
+		const pw = document.getElementById('password').value.trim();
+		const btns = document.querySelectorAll('.btn');
+
+		if (id !== '' && pw !== '') {
+			btns.forEach(btn => btn.classList.add('active'));
+		} else {
+			btns.forEach(btn => btn.classList.remove('active'));
+		}
+	}
+
+	document.getElementById('id').addEventListener('input', checkInputs);
+	document.getElementById('password').addEventListener('input', checkInputs);
 </script>

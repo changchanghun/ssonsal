@@ -20,6 +20,16 @@
         .form-label {
             font-weight: bold;
         }
+        #email_send{
+            margin:10px 0;
+        }
+        #verification_box{
+            margin:10px 0;
+        }
+        #email_verification{
+            width: 60%;
+            margin-right:8px;
+        }
         #emailCheckResult {
             display: block;
             margin-top: 8px;
@@ -44,14 +54,17 @@
             </div>
             <div>
                 <div>
-                    <button type="button" id="checkEmailBtn">중복확인 버튼</button>
+<!--                    <button type="button" id="checkEmailBtn">중복확인 버튼</button>-->
+                    <button type="button" id="checkEmailBtn" class="btn btn-outline-secondary btn-sm">이메일 중복 확인</button>
                     <span id="emailCheckResult"></span>
                 </div>
                 <div id="send_box" style="display:none;">
-                    <button type="button" id="email_send">이메일 인증하기</button>
+<!--                    <button type="button" id="email_send">이메일 인증하기</button>-->
+                    <button type="button" id="email_send" class="btn btn-outline-primary btn-sm">인증번호 받기</button>
                     <div id="verification_box" style="display:none;">
-                        <input type="text" id="email_verification">
-                        <button type="button" id="verification_btn">인증번호 확인</button>
+                        <input type="text" id="email_verification" class="form-control form-control-sm" placeholder="인증번호 입력">
+                        <button type="button" id="verification_btn" class="btn btn-success btn-sm">인증 확인</button>
+<!--                        <button type="button" id="verification_btn">인증번호 확인</button>-->
                     </div>
                 </div>
             </div>
@@ -135,7 +148,8 @@
                 }),
                 success: function (response) {
                     alert("전송 완료.");
-                    $("#verification_box").css("display","block");
+                    $("#email_send").css("display","none");
+                    $("#verification_box").css("display","flex");
                 },
                 error: function (xhr, status, error) {
                     alert("오류: " + xhr.responseText);
