@@ -10,8 +10,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <!-- 데이트 피커 -->
+    <script src="/js/app.js"></script>
 </head>
 <body>
+    <div th:replace="common/loading :: loading"></div>
     <div class="container">
         <div class="header" style="margin-bottom:100px;">
             <a class="home-btn" href="/">홈</a>
@@ -76,6 +78,7 @@
 </body>
 </html>
 <script>
+
     // 날짜
     $("#datepicker").datepicker({
         dateFormat: "yy-mm-dd",
