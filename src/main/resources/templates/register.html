@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #fff;
         }
         .register-container {
             max-width: 500px;
@@ -54,23 +54,27 @@
             </div>
             <div>
                 <div>
-<!--                    <button type="button" id="checkEmailBtn">중복확인 버튼</button>-->
+                    <!--                    <button type="button" id="checkEmailBtn">중복확인 버튼</button>-->
                     <button type="button" id="checkEmailBtn" class="btn btn-outline-secondary btn-sm">이메일 중복 확인</button>
                     <span id="emailCheckResult"></span>
                 </div>
                 <div id="send_box" style="display:none;">
-<!--                    <button type="button" id="email_send">이메일 인증하기</button>-->
+                    <!--                    <button type="button" id="email_send">이메일 인증하기</button>-->
                     <button type="button" id="email_send" class="btn btn-outline-primary btn-sm">인증번호 받기</button>
                     <div id="verification_box" style="display:none;">
                         <input type="text" id="email_verification" class="form-control form-control-sm" placeholder="인증번호 입력">
                         <button type="button" id="verification_btn" class="btn btn-success btn-sm">인증 확인</button>
-<!--                        <button type="button" id="verification_btn">인증번호 확인</button>-->
+                        <!--                        <button type="button" id="verification_btn">인증번호 확인</button>-->
                     </div>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="name" class="form-label">이름</label>
                 <input type="text" class="form-control" id="name" name="memberName" oninput="this.value = this.value.replace(/[0-9`~!@#$%^&*()_\-+=\[\]{}|\\;:'\,.<>/?]/g, '')" placeholder='이름은 한글 또는 영어만 입력 가능합니다' required>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">전화번호</label>
+                <input type="tel" class="form-control" id="phone" name="memberName" placeholder='- 제거한 숫자를 입력해주세요.' required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">비밀번호</label>
@@ -112,7 +116,7 @@
             }
 
             $.ajax({
-                url: "/check-email",
+                url: "/api/check-email",
                 type: "GET",
                 data: {email:email},
                 success: function(isDuplicate){
@@ -189,6 +193,8 @@
             const name = $.trim($("#name").val());
             const email = $.trim($("#email").val());
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^010\d{7,8}$/;
+            const phone = $.trim($("#phone").val());
             const pw = $.trim($("#password").val());
             const con_pw = $.trim($("#password_confirm").val());
 
@@ -200,6 +206,12 @@
                 return false;
             }else if (!name) {
                 alert("이름을 입력해주세요.");
+                return false;
+            }else if (!phone) {
+                alert("전화번호를 입력해주세요.");
+                return false;
+            }else if (!phoneRegex.test(phone)){
+                alert("올바른 전화번호를 입력해주세요");
                 return false;
             }else if (!pw) {
                 alert("비밀번호를 입력해주세요.");
@@ -216,12 +228,13 @@
             }
 
             $.ajax({
-                url: "/save",
+                url: "/api/save",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({
                     memberName: name,
                     memberEmail: email,
+                    phoneNumber: phone,
                     memberPassword: pw
                 }),
                 success: function (response) {

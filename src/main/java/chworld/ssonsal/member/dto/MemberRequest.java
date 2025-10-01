@@ -13,6 +13,7 @@ public class MemberRequest {
     private String memberEmail;
     private String memberName;
     private String memberPassword;
+    private String phoneNumber;
     private String status;
 
 }

@@ -31,6 +31,9 @@ public class Member {
     @Column(name="m_pw", nullable = false)
     private String memberPassword;
 
+    @Column(name="phone", nullable = false)
+    private String phoneNumber;
+
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
@@ -44,10 +47,11 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Todo> todos = new ArrayList<>();
 
-    public Member(String memberEmail, String memberName, String memberPassword, MemberStatus status, chworld.ssonsal.member.domain.Role user){
+    public Member(String memberEmail, String memberName, String memberPassword, String phoneNumber, MemberStatus status, chworld.ssonsal.member.domain.Role user){
         this.memberEmail = memberEmail;
         this.memberName = memberName;
         this.memberPassword = memberPassword;
+        this.phoneNumber = phoneNumber;
         this.createdDate = LocalDateTime.now();
         this.status = MemberStatus.DONE;
         this.role = Role.USER;

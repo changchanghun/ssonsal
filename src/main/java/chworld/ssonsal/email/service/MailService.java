@@ -34,4 +34,24 @@ public class MailService {
             throw new IllegalStateException("메일 전송 실패", e);
         }
     }
+
+    @Async
+    public void sendTempPassword(String email, String tempPassword){
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(senderEmail);
+            message.setRecipients(MimeMessage.RecipientType.TO, email);
+            message.setSubject("임시 비밀번호 안내");
+            String body = "임시 비밀번호는 다음과 같습니다.";
+            body += "<h3>" + "." + "</h3>";
+            body += "<h1>" + tempPassword + "</h1>";
+            body += "<h3>" + "감사합니다." + "</h3>";
+            message.setText(body,"UTF-8", "html");
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            log.error("메일 전송 중 오류 발생", e);
+            throw new IllegalStateException("메일 전송 실패", e);
+        }
+    }
 }

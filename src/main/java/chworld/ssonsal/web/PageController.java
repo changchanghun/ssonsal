@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +31,21 @@ public class PageController {
 
     @GetMapping("/register")
     public String register(){ return "register"; }
+
+    @GetMapping("/find_id")
+    public String find_id(){ return "find_id"; }
+
+    @GetMapping("/find_pw")
+    public String find_pw(){ return "find_pw"; }
+
+    @GetMapping("/find_res")
+    public String find_res(@RequestParam("type") String type, RedirectAttributes redirect){
+        if(!("1".equals(type) || "2".equals(type))){
+                return "redirect:/";
+        }
+
+        return "find_res";
+    }
 
     @GetMapping("/login")
     public String login(){ return "login"; }

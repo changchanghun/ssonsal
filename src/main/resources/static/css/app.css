@@ -144,8 +144,13 @@ button { cursor: pointer; }
 
 
 .todo-item {
-  display: flex; align-items: center; justify-content: space-between;
-  border-radius: 12px; cursor: pointer; font-size:15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size:15px;
+  margin-top:10px;
 }
 .todo-item.active{
   background-color: #eee;
