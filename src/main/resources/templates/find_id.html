@@ -71,4 +71,20 @@
             }
         });
     });
+
+    function checkInputs() {
+		const name = document.getElementById('find_name').value.trim();
+		const mobile = document.getElementById('find_mobile').value.trim();
+		const btns = document.querySelectorAll('.btn');
+
+		if (name !== '' && mobile !== '') {
+			btns.forEach(btn => btn.classList.add('active'));
+		} else {
+			btns.forEach(btn => btn.classList.remove('active'));
+		}
+	}
+
+	document.getElementById('find_name').addEventListener('input', checkInputs);
+	document.getElementById('find_mobile').addEventListener('input', checkInputs);
+
 </script>

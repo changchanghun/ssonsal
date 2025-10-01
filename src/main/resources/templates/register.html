@@ -41,6 +41,16 @@
             margin-left: 8px;
             vertical-align: middle;
         }
+
+        .btn.sub{
+            background: #ccc !important;
+            margin: 15px 0;
+        }
+        .btn.sub.active {
+            background: #007bff !important;
+            color: #fff !important;
+            border: unset !important;
+        }
     </style>
 </head>
 <body>
@@ -85,7 +95,7 @@
                 <input type="password" class="form-control" id="password_confirm" name="memberPasswordConfirm" required>
             </div>
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">가입하기</button>
+                <button type="submit" class="btn sub">가입하기</button>
             </div>
         </form>
         <div class="text-center mt-3">
@@ -247,5 +257,28 @@
                 }
             });
         });
+
+        function checkInputs() {
+            const id = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const password_confirm = document.getElementById('password_confirm').value.trim();
+            const email_verification = document.getElementById('email_verification').value.trim();
+            const btns = document.querySelectorAll('.btn');
+
+            if (id !== '' && name !== '' && phone !== '' && password !== '' && password_confirm !== '' && email_verification ! == '') {
+                btns.forEach(btn => btn.classList.add('active'));
+            } else {
+                btns.forEach(btn => btn.classList.remove('active'));
+            }
+	    }
+
+        document.getElementById('email').addEventListener('input', checkInputs);
+        document.getElementById('name').addEventListener('input', checkInputs);
+        document.getElementById('phone').addEventListener('input', checkInputs);
+        document.getElementById('password').addEventListener('input', checkInputs);
+        document.getElementById('password_confirm').addEventListener('input', checkInputs);
+        document.getElementById('email_verification').addEventListener('input', checkInputs);
     });
 </script>
