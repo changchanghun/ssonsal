@@ -267,7 +267,7 @@
             const email_verification = document.getElementById('email_verification').value.trim();
             const btns = document.querySelectorAll('.btn');
 
-            if (id !== '' && name !== '' && phone !== '' && password !== '' && password_confirm !== '' && email_verification ! == '') {
+            if (id !== '' && name !== '' && phone !== '' && password !== '' && password_confirm !== '' && email_verification !== '') {
                 btns.forEach(btn => btn.classList.add('active'));
             } else {
                 btns.forEach(btn => btn.classList.remove('active'));
